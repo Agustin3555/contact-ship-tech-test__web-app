@@ -170,7 +170,7 @@ const Transcript = ({ audioSrc, timestamps }: Props) => {
             type="range"
             value={currentTime}
             min={0}
-            max={audioRef.current?.duration || 0}
+            max={audioRef.current?.duration}
             onChange={handleRangeChange}
           />
           <small className="w-11 text-sm text-end">{currentTimeText}</small>
