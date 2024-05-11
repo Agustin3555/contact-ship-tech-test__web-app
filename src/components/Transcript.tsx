@@ -3,20 +3,11 @@
 import { ChangeEventHandler, useEffect, useRef, useState } from 'react'
 import Button from './Button'
 import { CaretLeft, PlayerPause, PlayerPlay, PlayerStop, User } from './icons'
-
-enum Role {
-  USER = 'user',
-  AGENT = 'agent',
-}
+import { Role, Timestamp } from '@/types'
 
 interface Props {
   audioSrc: string
-  timestamps: {
-    role: Role
-    content: string
-    start: number
-    end: number
-  }[]
+  timestamps: Timestamp[]
 }
 
 const INDICATOR_TOP_INIT = 32
