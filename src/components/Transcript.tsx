@@ -49,9 +49,13 @@ const Transcript = ({ audioSrc, timestamps }: Props) => {
       return
     }
 
-    const currentMessage = timestamps.find(
-      ({ start, end }) => start <= currentTime && currentTime <= end
-    )
+    const currentMessage = timestamps.find(({ start, end }) => {
+      const marginOfError = 0.1
+      return (
+        start - marginOfError <= currentTime &&
+        currentTime <= end + marginOfError
+      )
+    })
 
     if (currentMessage) {
       const currentMessageElement =
