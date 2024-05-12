@@ -18,6 +18,7 @@
 .transcript {
   max-height: calc(100% - 1.5rem * 2);
 
+  transition-property: margin width max-height border-radius;
   animation: show 700ms ease forwards;
 
   .chat {

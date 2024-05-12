@@ -135,7 +135,7 @@ const Transcript = ({ audioSrc, timestamps }: Props) => {
   )
 
   return (
-    <article className="transcript relative flex flex-col mx-6 text-sm w-[32rem] rounded-2xl text-indigo-400 bg-white shadow-2xl scale-110 translate-y-28 opacity-0 overflow-hidden">
+    <article className="transcript relative flex flex-col mx-6 text-sm w-[32rem] rounded-2xl text-indigo-400 bg-white shadow-2xl scale-110 translate-y-28 opacity-0 overflow-hidden max-[640px]:rounded-none max-[640px]:m-0 max-[640px]:max-h-full max-[640px]:h-full max-[640px]:w-full duration-300 ease-out">
       <div className="chat flex-grow relative p-8 overflow-auto">
         <ol ref={messagesRef} className="flex flex-col gap-4">
           {timestamps.map(({ role, content, start, end }) => (
