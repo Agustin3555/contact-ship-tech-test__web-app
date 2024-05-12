@@ -1,6 +1,13 @@
 'use client'
 
-import { ChangeEventHandler, useEffect, useRef, useState } from 'react'
+import {
+  ChangeEventHandler,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useCallback,
+} from 'react'
 import Button from './Button'
 import { CaretLeft, PlayerPause, PlayerPlay, PlayerStop, User } from './icons'
 import { Role, Timestamp } from '@/types'
@@ -20,77 +27,88 @@ const Transcript = ({ audioSrc, timestamps }: Props) => {
   const messagesRef = useRef<HTMLOListElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
 
-  const currentTimeText = `${Math.floor(currentTime / 60)
-    .toString()
-    .padStart(2, '0')} : ${Math.floor(currentTime % 60)
-    .toString()
-    .padStart(2, '0')}`
+  const currentTimeText = useMemo(() => {
+    const minutes = Math.floor(currentTime / 60)
+      .toString()
+      .padStart(2, '0')
+    const seconds = Math.floor(currentTime % 60)
+      .toString()
+      .padStart(2, '0')
+
+    return `${minutes} : ${seconds}`
+  }, [currentTime])
 
   useEffect(() => {
-    if (messagesRef.current) {
-      if (audioRef.current) {
-        const duration = audioRef.current.duration
+    if (!audioRef.current) return
 
-        if (currentTime === duration) {
-          setIsPlaying(false)
-          setCurrentTime(0)
-        }
-      }
+    const duration = audioRef.current.duration
 
-      const currentMessage = timestamps.find(
-        ({ start, end }) => currentTime >= start && currentTime <= end
-      )
+    if (currentTime === duration) {
+      setIsPlaying(false)
+      setCurrentTime(0)
+      setIndicatorTop(INDICATOR_TOP_INIT)
+    }
 
-      if (currentMessage) {
-        const currentMessageElement =
-          messagesRef.current.querySelector<HTMLElement>(
-            `[data-start="${currentMessage.start}"]`
-          )
+    const currentMessage = timestamps.find(
+      ({ start, end }) => currentTime >= start && currentTime <= end
+    )
 
-        if (currentMessageElement)
-          setIndicatorTop(
-            currentMessageElement.offsetTop +
-              (currentMessageElement.clientHeight + 20) / 2
-          )
-      }
+    if (currentMessage) {
+      const currentMessageElement =
+        messagesRef.current?.querySelector<HTMLElement>(
+          `[data-start="${currentMessage.start}"]`
+        )
+
+      if (currentMessageElement)
+        setIndicatorTop(
+          currentMessageElement.offsetTop +
+            (currentMessageElement.clientHeight + 20) / 2
+        )
     }
   }, [currentTime, timestamps])
 
-  const handleAudioTimeUpdate = () => {
-    if (audioRef.current) setCurrentTime(audioRef.current.currentTime)
-  }
+  const handleAudioTimeUpdate = useCallback(() => {
+    if (!audioRef.current) return
 
-  const handleRangeChange: ChangeEventHandler<HTMLInputElement> = e => {
-    if (audioRef.current) {
+    setCurrentTime(audioRef.current.currentTime)
+  }, [])
+
+  const handleRangeChange: ChangeEventHandler<HTMLInputElement> = useCallback(
+    e => {
+      if (!audioRef.current) return
+
       const time = Number(e.target.value)
-
       audioRef.current.currentTime = time
       setCurrentTime(time)
-    }
-  }
+    },
+    []
+  )
 
-  const handleTogglePlay = () => {
-    if (audioRef.current) {
-      isPlaying ? audioRef.current.pause() : audioRef.current.play()
-      setIsPlaying(prevValue => !prevValue)
-    }
-  }
+  const handleTogglePlay = useCallback(() => {
+    if (!audioRef.current) return
 
-  const handleButtonStop = () => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.currentTime = 0
-      setIsPlaying(false)
-      setIndicatorTop(INDICATOR_TOP_INIT)
-    }
-  }
+    isPlaying ? audioRef.current.pause() : audioRef.current.play()
+    setIsPlaying(prevValue => !prevValue)
+  }, [isPlaying])
 
-  const handleMessageClick = (start: number) => () => {
-    if (audioRef.current) {
+  const handleButtonStop = useCallback(() => {
+    if (!audioRef.current) return
+
+    audioRef.current.pause()
+    audioRef.current.currentTime = 0
+    setIsPlaying(false)
+    setIndicatorTop(INDICATOR_TOP_INIT)
+  }, [])
+
+  const handleMessageClick = useCallback(
+    (start: number) => () => {
+      if (!audioRef.current) return
+
       audioRef.current.currentTime = start
       setCurrentTime(start)
-    }
-  }
+    },
+    []
+  )
 
   return (
     <article className="transcript relative flex flex-col mx-6 text-sm w-[32rem] rounded-2xl text-indigo-400 bg-white shadow-2xl scale-110 translate-y-28 opacity-0 overflow-hidden">
@@ -173,7 +191,9 @@ const Transcript = ({ audioSrc, timestamps }: Props) => {
             max={audioRef.current?.duration}
             onChange={handleRangeChange}
           />
-          <small className="w-11 text-sm text-end">{currentTimeText}</small>
+          <small className="current-time w-11 text-sm text-end">
+            {currentTimeText}
+          </small>
         </div>
       </div>
     </article>

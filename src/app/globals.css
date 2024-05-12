@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-small {
-  word-spacing: -0.125rem;
-}
-
 @keyframes playing {
   to {
     outline-width: 0.25rem;
@@ -56,25 +52,27 @@ small {
       transition-property: top;
     }
   }
-}
 
-input[type='range'] {
-  background-color: rgb(148 163 184 / var(--tw-text-opacity));
+  input[type='range'] {
+    &::-webkit-slider-thumb {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
 
-  &::-webkit-slider-thumb {
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
+      background-color: currentColor;
+      -webkit-appearance: none;
+    }
 
-    background-color: currentColor;
-    -webkit-appearance: none;
+    &:hover::-webkit-slider-thumb {
+      cursor: grab;
+    }
+
+    &:active::-webkit-slider-thumb {
+      cursor: grabbing;
+    }
   }
 
-  &:hover::-webkit-slider-thumb {
-    cursor: grab;
-  }
-
-  &:active::-webkit-slider-thumb {
-    cursor: grabbing;
+  .current-time {
+    word-spacing: -0.125rem;
   }
 }
