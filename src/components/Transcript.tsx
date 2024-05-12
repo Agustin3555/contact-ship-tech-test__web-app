@@ -39,31 +39,52 @@ const Transcript = ({ audioSrc, timestamps }: Props) => {
   }, [currentTime])
 
   useEffect(() => {
-    if (!audioRef.current) return
+    if (!audioRef.current || !messagesRef.current) return
 
     const duration = audioRef.current.duration
 
     if (currentTime === duration) {
       setIsPlaying(false)
       setCurrentTime(0)
-      setIndicatorTop(INDICATOR_TOP_INIT)
+      return
     }
 
     const currentMessage = timestamps.find(
-      ({ start, end }) => currentTime >= start && currentTime <= end
+      ({ start, end }) => start <= currentTime && currentTime <= end
     )
 
     if (currentMessage) {
       const currentMessageElement =
-        messagesRef.current?.querySelector<HTMLElement>(
+        messagesRef.current.querySelector<HTMLElement>(
           `[data-start="${currentMessage.start}"]`
         )
 
-      if (currentMessageElement)
+      if (!currentMessageElement) return
+
+      setIndicatorTop(
+        currentMessageElement.offsetTop +
+          (currentMessageElement.clientHeight + 20) / 2
+      )
+    } else {
+      const nextMessage = timestamps.find(({ start }) => currentTime < start)
+
+      if (!nextMessage) {
         setIndicatorTop(
-          currentMessageElement.offsetTop +
-            (currentMessageElement.clientHeight + 20) / 2
+          messagesRef.current.offsetTop +
+            messagesRef.current.clientHeight +
+            16 / 2
         )
+        return
+      }
+
+      const nextMessageElement = messagesRef.current.querySelector<HTMLElement>(
+        `[data-start="${nextMessage.start}"]`
+      )
+
+      if (!nextMessageElement) return
+
+      const silenceTop = nextMessageElement.offsetTop - 16 / 2
+      setIndicatorTop(silenceTop)
     }
   }, [currentTime, timestamps])
 
@@ -97,7 +118,6 @@ const Transcript = ({ audioSrc, timestamps }: Props) => {
     audioRef.current.pause()
     audioRef.current.currentTime = 0
     setIsPlaying(false)
-    setIndicatorTop(INDICATOR_TOP_INIT)
   }, [])
 
   const handleMessageClick = useCallback(
@@ -163,7 +183,7 @@ const Transcript = ({ audioSrc, timestamps }: Props) => {
         </span>
       </div>
 
-      <div className="flex items-center gap-4 p-4 border-t border-indigo-100 shadow-2xl">
+      <footer className="flex items-center gap-4 p-4 border-t border-indigo-100 shadow-2xl">
         <audio
           ref={audioRef}
           src={audioSrc}
@@ -195,7 +215,7 @@ const Transcript = ({ audioSrc, timestamps }: Props) => {
             {currentTimeText}
           </small>
         </div>
-      </div>
+      </footer>
     </article>
   )
 }

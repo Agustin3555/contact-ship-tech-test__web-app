@@ -2,16 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes playing {
-  to {
-    outline-width: 0.25rem;
-  }
-}
-
 @keyframes show {
   to {
     transform: initial;
     opacity: 1;
+  }
+}
+
+@keyframes playing {
+  to {
+    outline-width: 0.25rem;
   }
 }
 
