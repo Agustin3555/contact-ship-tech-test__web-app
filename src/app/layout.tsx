@@ -13,7 +13,9 @@ export const metadata: Metadata = {
 
 const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => (
   <html lang="es">
-    <body className={`relative bg-indigo-50 ${inter.className}`}>
+    <body
+      className={`${inter.className} relative bg-indigo-50 overflow-hidden`}
+    >
       <span className="absolute right-0 top-0 h-[31.25rem] w-[31.25rem] -translate-x-[80%] translate-y-[20%] rounded-full bg-blue-300 blur-[6rem] opacity-50"></span>
       {children}
     </body>
